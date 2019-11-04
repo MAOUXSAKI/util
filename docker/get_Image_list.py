@@ -35,15 +35,20 @@ def getImagesNames(repo_ip,project_name=None):
     return docker_images
 
 
-docker_images = getImagesNames(repo_ip,'deploy')
-if len(sys.argv) == 1 or sys.argv[1] == 'len':
-    print(len(docker_images))
-elif sys.argv[1] == 'list':
-    for image in docker_images:
-        print(image.strip())
-elif sys.argv[1] == 'pull':
+if len(sys.argv) == 1 or sys.argv[1] == 'list':
+    if len(sys.argv) > 2:
+        project_name = sys.argv[2]
+    else
+        project_name = None
+    docker_images = getImagesNames(repo_ip,project_name)
     f1 = open('docker_images.txt','w')
     f1.writelines(docker_images)
+    for image in docker_images:
+        print(image.strip())
+    print(len(docker_images))
+elif sys.argv[1] == 'pull':
+    f1 = open('docker_images.txt','r')
+    docker_images = f1.readlines()
     client1 = docker.from_env()
     count = 0
     for image in docker_images:
