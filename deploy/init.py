@@ -58,15 +58,18 @@ if __name__ == '__main__':
 
     web_services = config_yml['web']['services']
 
+    tag = str(config_yml['web']['tag'])
+
     services = OrderedDict()
 
     for k, v in web_services.items():
-        tag = str(v['tag'])
+        if 'tag' in v:
+            tag = str(v['tag'])
         environment_list = []
         environment_list.append('TZ=' + time_zone)
         service = OrderedDict()
         if k == 'web':
-            service['image'] = '10.32.233.112/ami/ami-web:' + tag
+            service['image'] = 'image.kaifa-empower.com/ami/ami-web:' + tag
             if 'config-dir' in v:
                 service['volumes'] = [v['config-dir'] + ':/etc/properties']
         else:
@@ -87,7 +90,7 @@ if __name__ == '__main__':
                 health_check['interval'] = "20s"
                 health_check['start_period'] = "10s"
                 service['healthcheck'] = health_check
-            service['image'] = '10.32.233.112/ami/ami-api-' + k + '-service:' + tag
+            service['image'] = 'image.kaifa-empower.com/ami/ami-api-' + k + '-service:' + tag
             if 'config-dir' in v:
                 service['volumes'] = [v['config-dir'] + ':/etc/properties']
             if 'project' in v:
