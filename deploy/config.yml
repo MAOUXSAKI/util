@@ -1,0 +1,62 @@
+---
+tz: Asia/Shanghai
+project: ivy
+
+web:
+  services:
+    web:
+      tag: latest
+      port: 80
+      config-dir: /root/config
+    register:
+      tag: latest
+      memory: 512m
+      config-dir: /root/config
+      ex-param:
+    config:
+      tag: 1.0
+      memory: 512m
+      config-dir: /root/config
+      ex-param:
+    gateway:
+      tag: 95-2019-11-20
+      memory: 512m
+      port: 10000
+      ex-param:
+    user:
+      tag: 51-2019-11-20
+      memory: 512m
+      ex-param:
+
+hes:
+  services:
+    hes-core:
+      tag: 2019-10-10-20
+      config-file: /etc/hes-core
+      ex-param:
+    fep:
+      tag: 2019-10-10-20
+      config-file: /etc/fep
+      license-file: /etc/license
+      ex-param:
+    api:
+      tag: 2019-10-10-20
+      config-file: /etc/fep
+      ex-param:
+
+dpp:
+  services:
+    kafka:
+      node: 3
+    zookeeper:
+      node: 3
+    spark:
+      public_dns:
+      master:
+        node: 1
+        port: 8080
+      work: 
+        node: 2
+        memory: 1g
+        cpu: 4
+
