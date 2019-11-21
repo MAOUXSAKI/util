@@ -44,11 +44,10 @@ def ordered_yaml_dump(data, stream=None, Dumper=yaml.SafeDumper, **kwds):
 
 
 if __name__ == '__main__':
-    mkdir('docker-compose')
-    config_yml = ordered_yaml_load("config.yml")
-    docker_compose_file = open("docker-compose/docker-compose.yml", "w")
+    mkdir('/data/ami')
+    config_yml = ordered_yaml_load("/etc/config.yml")
+    docker_compose_file = open("/data/ami/docker-compose.yml", "w")
 
-    print(config_yml)
 
     docker_compose = OrderedDict()
     docker_compose['version'] = '2.4'
@@ -84,7 +83,7 @@ if __name__ == '__main__':
                     depends_on['register-service'] = {"condition": "service_healthy"}
                     service['depends_on'] = depends_on
                 health_check = OrderedDict()
-                health_check['test'] = "netstat -tupan | grep LISTEN | grep 8880 && exit 0 || exit 1"
+                health_check['test'] = "netstat -tupan | grep LISTEN | grep 8080 && exit 0 || exit 1"
                 health_check['timeout'] = "5s"
                 health_check['retries'] = 10
                 health_check['interval'] = "20s"
