@@ -38,7 +38,7 @@ def getImagesNames(repo_ip,project_name=None):
 if len(sys.argv) == 1 or sys.argv[1] == 'list':
     if len(sys.argv) > 2:
         project_name = sys.argv[2]
-    else
+    else:
         project_name = None
     docker_images = getImagesNames(repo_ip,project_name)
     f1 = open('docker_images.txt','w')
