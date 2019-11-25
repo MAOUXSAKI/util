@@ -50,7 +50,7 @@ if __name__ == '__main__':
 
 
     docker_compose = OrderedDict()
-    docker_compose['version'] = '2.4'
+    docker_compose['version'] = '2.3'
 
     time_zone = config_yml['tz']
     project = config_yml['project']

@@ -10,7 +10,7 @@ web:
       port: 80
       config-dir: /opt/docker/properties
     register:
-      tag: develop-7-2019-11-21
+      tag: 1.0
       memory: 512m
       ex-param:
     config:
@@ -19,7 +19,7 @@ web:
       config-dir: /opt/docker/properties
       ex-param:
     gateway:
-      tag: 98-2019-11-22
+      tag: 98-2019-11-21
       memory: 512m
       port: 10000
       ex-param:
@@ -35,8 +35,6 @@ web:
       memory: 512m
     system:
       tag: 19-2019-11-21
-    prepay:
-      tag: develop-1-2019-11-21 
     hes:
       tag: 70-2019-11-21
     archive:
