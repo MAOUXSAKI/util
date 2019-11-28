@@ -1,0 +1,73 @@
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: ami
+    component: web
+  name: ami-web
+spec:
+  ports:
+    - name: client
+      port: 8080
+      protocol: TCP
+      targetPort: 8080
+  selector:
+    app: ami
+    component: web
+  type: ClusterIP
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: ami
+    component: register
+  name: register-service
+spec:
+  ports:
+    - name: client
+      port: 8080
+      protocol: TCP
+      targetPort: 8080
+  selector:
+    app: ami
+    component: register
+  type: ClusterIP
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: ami
+    component: gateway
+  name: gateway-service
+spec:
+  externalTrafficPolicy: Cluster
+  ports:
+    - name: client
+      port: 8080
+      protocol: TCP
+      targetPort: 8080
+  selector:
+    app: ami
+    component: gateway
+  type: NodePort
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: ami
+  name: ami-hs
+spec:
+  clusterIP: None
+  ports:
+    - name: server
+      port: 8080
+      protocol: TCP
+      targetPort: 8080
+  selector:
+    app: ami
+  type: ClusterIP
+

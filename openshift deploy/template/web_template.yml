@@ -1,0 +1,54 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  labels:
+    app: ami
+    component: web
+  name: ami-web
+spec:
+  selector:
+    matchLabels:
+      app: ami
+      component: web
+  serviceName: ami-hs
+  template:
+    metadata:
+      labels:
+        app: ami
+        component: web
+        system: ami
+    spec:
+      affinity:
+        podAntiAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            - labelSelector:
+                matchExpressions:
+                  - key: app
+                    operator: In
+                    values:
+                      - ami
+                  - key: component
+                    operator: In
+                    values:
+                      - web
+              topologyKey: kubernetes.io/hostname
+      containers:
+        - image: @IMAGE@
+          imagePullPolicy: IfNotPresent
+          name: ami-web
+          ports:
+            - containerPort: 8080
+              name: client
+              protocol: TCP
+          volumeMounts:
+            - mountPath: /etc/properties
+              name: ami-web-properties
+              readOnly: true
+          env:
+            - name: TZ
+              value: @TIME_ZONE@
+      volumes:
+        - configMap:
+            defaultMode: 420
+            name: ami-web-properties
+          name: ami-web-properties

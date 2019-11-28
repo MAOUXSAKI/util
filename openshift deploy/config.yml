@@ -1,0 +1,37 @@
+---
+tz: Asia/Shanghai
+project: ivy
+config_mode: apollo
+repository: 10.32.233.112
+web:
+  tag: latest
+  services:
+    web:
+      tag: 336
+      port: 80
+      config-dir: /opt/docker/properties
+    register:
+      tag: 1.0
+      memory: 512m
+      ex-param:
+    gateway:
+      tag: 98-2019-11-21
+      memory: 512m
+      port: 10000
+      ex_param:
+    user:
+      tag: 57-2019-11-21
+      memory: 512m
+      ex_param:
+    cache:
+      tag: 2019-09-29-454
+      memory: 512m
+    mdm:
+      tag: 2019-11-21
+      memory: 512m
+    system:
+      tag: 19-2019-11-21
+    hes:
+      tag: 70-2019-11-21
+    archive:
+      tag: develop-49-2019-11-21
