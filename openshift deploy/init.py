@@ -72,7 +72,7 @@ class Service:
         self.config_mode = ""
         self.config = ""
         self.volumes = []
-        self.namespase = ""
+        self.namespace = ""
 
     def set_info(self, name, data):
         self.name = name
@@ -114,7 +114,7 @@ class Service:
             replace(target_file_name, "@CONFIG_MODE@", self.config_mode)
             replace(target_file_name, "@PROJECT@", self.project_template)
             replace(target_file_name, "@APOLLO_PROJECT@", self.project)
-            replace(target_file_name, "@NAMESPACE@",self.namespase)
+            replace(target_file_name, "@NAMESPACE@",self.namespace)
 
 
 class Project:
@@ -143,7 +143,7 @@ class Project:
             if 'namespace' in config:
                 self.namespace = config['namespace']
             else:
-                self.namespace = "kaifa.web-api,application"
+                self.namespace = "infrastructure,dateformat,external-api,web-other"
             self.time_zone = config['tz']
             self.web = config['web']
             self.service_list = []
@@ -156,7 +156,7 @@ class Project:
                 service.project_template = self.project_template
                 service.time_zone = self.time_zone
                 service.config_mode = self.config_mode
-                service.namespase = self.namespace
+                service.namespace = self.namespace
                 service.set_info(k,v)
                 self.service_list.append(service)
 
