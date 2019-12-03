@@ -1,0 +1,73 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  labels:
+    app: ami
+    component: @NAME@
+  name: ami-@NAME@
+spec:
+  selector:
+    matchLabels:
+      app: ami
+      component: @NAME@
+  serviceName: ami-hs
+  template:
+    metadata:
+      labels:
+        app: ami
+        component: @NAME@
+        system: ami
+    spec:
+      affinity:
+        podAntiAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            - labelSelector:
+                matchExpressions:
+                  - key: app
+                    operator: In
+                    values:
+                      - ami
+                  - key: component
+                    operator: In
+                    values:
+                      - @NAME@
+              topologyKey: kubernetes.io/hostname
+      containers:
+        - env:
+            - name: PROJECT
+              value: @PROJECT@
+            - name: APOLLO_PROJECT
+              value: @APOLLO_PROJECT@
+            - name: TZ
+              value: @TIME_ZONE@
+            - name: XMX_SIZE
+              value: @MEMORY@
+            - name: CONFIG
+              value: @CONFIG_MODE@
+            - name: NAMESPACE
+              value: @NAMESPACE@
+            - name: JAVA_OPT
+              value: -Dapollo.bootstrap.namespaces=@NAMESPACE@
+          image: @IMAGE@
+          imagePullPolicy: IfNotPresent
+          livenessProbe:
+            failureThreshold: 3
+            initialDelaySeconds: 3000
+            periodSeconds: 60
+            successThreshold: 1
+            tcpSocket:
+              port: 8080
+            timeoutSeconds: 1
+          name: ami-@NAME@
+          ports:
+            - containerPort: 8080
+              name: client
+              protocol: TCP
+          readinessProbe:
+            failureThreshold: 3
+            initialDelaySeconds: 60
+            periodSeconds: 10
+            successThreshold: 1
+            tcpSocket:
+              port: 8080
+            timeoutSeconds: 1
