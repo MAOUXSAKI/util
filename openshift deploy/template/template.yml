@@ -52,7 +52,7 @@ spec:
           imagePullPolicy: IfNotPresent
           livenessProbe:
             failureThreshold: 3
-            initialDelaySeconds: 3000
+            initialDelaySeconds: 1200
             periodSeconds: 60
             successThreshold: 1
             tcpSocket:
@@ -71,3 +71,6 @@ spec:
             tcpSocket:
               port: 8080
             timeoutSeconds: 1
+          resources:
+            requests:
+              memory: @MEMORY@

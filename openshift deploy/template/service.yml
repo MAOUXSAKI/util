@@ -32,7 +32,7 @@ spec:
       targetPort: 8080
   selector:
     app: ami
-    component: register
+    component: api-register-service
   type: ClusterIP
 ---
 apiVersion: v1
@@ -51,7 +51,7 @@ spec:
       targetPort: 8080
   selector:
     app: ami
-    component: gateway
+    component: api-gateway-service
   type: NodePort
 ---
 apiVersion: v1
@@ -70,4 +70,21 @@ spec:
   selector:
     app: ami
   type: ClusterIP
-
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: ami
+    component: ivy-app
+  name: ivy-app-service
+spec:
+  ports:
+    - name: client
+      port: 8080
+      protocol: TCP
+      targetPort: 8080
+  selector:
+    app: ami
+    component: api-ivy-app-service
+  type: NodePort

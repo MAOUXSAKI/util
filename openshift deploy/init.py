@@ -1,10 +1,10 @@
 from collections import OrderedDict
 import yaml
 import shutil
+import os
 
 
 def mkdir(path):
-    import os
     path = path.strip()
     path = path.rstrip("\\")
     isExists = os.path.exists(path)
@@ -13,6 +13,14 @@ def mkdir(path):
         return True
     else:
         return False
+
+def remove_dir(path):
+    isExists = os.path.exists(path)
+    if not isExists:
+        return False
+    else:
+        shutil.rmtree("target")
+        return True
 
 
 def ordered_yaml_load(yaml_path, Loader=yaml.Loader,
@@ -75,17 +83,17 @@ class Service:
         self.namespace = ""
 
     def set_info(self, name, data):
-        self.name = name
+        if name != "web":
+            self.name = "api-" + name + "-service"
+        else:
+            self.name = name
         if "port" in data:
             self.port = data["port"]
         if "config-dir" in data:
             self.config = data["config-dir"]
         if 'tag' in data:
             self.tag = data['tag']
-        if self.name != "web":
-            self.image = self.repository + "/ami/ami-api-" + self.name + "-service:" + str(self.tag)
-        else:
-            self.image = self.repository + "/ami/ami-" + self.name + ":" + str(self.tag)
+        self.image = self.repository + "/ami/ami-" + self.name + ":" + str(self.tag)
         if 'memory' in data:
             self.memory = data['memory']
         if 'project_template' in data:
@@ -147,8 +155,6 @@ class Project:
             self.time_zone = config['tz']
             self.web = config['web']
             self.service_list = []
-            shutil.copyfile("template/web-config-map.yml", "target/web-config-map.yml")
-            shutil.copyfile("template/service.yml", "target/service.yml")
             for k,v in self.web['services'].items():
                 service = Service()
                 service.repository = self.repository
@@ -161,7 +167,10 @@ class Project:
                 self.service_list.append(service)
 
     def generate_openshift_file(self):
+        remove_dir("target")
         mkdir("target")
+        shutil.copyfile("template/web-config-map.yml", "target/web-config-map.yml")
+        shutil.copyfile("template/service.yml", "target/service.yml")
         for service in self.service_list:
             service.generate_openshift_file()
 

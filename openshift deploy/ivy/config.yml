@@ -1,0 +1,56 @@
+tz: Asia/Shanghai
+project: ivy-qa
+project_template: ivy
+config_mode: apollo
+repository: 10.32.233.112
+web:
+  tag: latest
+  services:
+    web:
+      tag: master-380
+      port: 80
+      config-dir: /opt/docker/properties
+    register:
+      tag: 1.0
+      memory: 512m
+      ex-param:
+    gateway:
+      tag: 2.0.11.0F2019-12-01-106
+      memory: 512m
+      port: 10000
+      ex_param:
+    archive:
+      tag: 2.0.11.0F2019-12-01-86
+    big-data:
+      tag: develop-11-2019-11-22
+    cache:
+      tag: 2.0.11.0F2019-12-03-14
+      memory: 512m
+    hes-core:
+      tag: 2.0.10.0F2019-11-29-19
+    hes:
+      tag: 2.0.11.0F2019-12-03-102
+    inventory:
+      tag: 2.0.10.0F2019-11-29-22
+    ivy-app:
+      tag: 2.0.10.0F2019-11-29-26
+    ivy:
+      tag: 2.0.10.0F2019-12-01-63
+    job:
+      tag: 2.0.10.0F2019-11-29-47
+    mdm:
+      tag: 2.0.11.0F2019-12-02-43
+      memory: 512m
+    smart-app:
+      tag: 2.0.11.0-F2019-12-04-16
+    system:
+      tag: 2.0.10.0F2019-11-29-29
+    user:
+      tag: 2.0.11.0F2019-12-02-76
+      memory: 512m
+      ex_param:
+
+
+
+
+
