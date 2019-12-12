@@ -26,7 +26,7 @@ def ordered_yaml_load(yaml_path, Loader=yaml.Loader,
     OrderedLoader.add_constructor(
         yaml.resolver.BaseResolver.DEFAULT_MAPPING_TAG,
         construct_mapping)
-    with open(yaml_path) as stream:
+    with open(yaml_path,encoding='UTF-8') as stream:
         return yaml.load(stream, OrderedLoader)
 
 
@@ -54,6 +54,20 @@ if __name__ == '__main__':
 
     time_zone = config_yml['tz']
     project = config_yml['project']
+    if 'project_template' in config_yml['project_template']:
+        project_template = config_yml['project_template']
+    else:
+        project_template = project
+    repository = config_yml['repository']
+    if 'config_mode' in config_yml:
+        config_mode = config_yml['config_mode']
+    else:
+        config_mode = 'cloud-config'
+
+    if 'namespace' in config_yml:
+        namespace = config_yml['namespace']
+    else:
+        namespace = 'infrastructure,dateformat,external-api,web-other'
 
     web_services = config_yml['web']['services']
 
@@ -68,14 +82,20 @@ if __name__ == '__main__':
         environment_list.append('TZ=' + time_zone)
         service = OrderedDict()
         if k == 'web':
-            service['image'] = 'image.kaifa-empower.com/ami/ami-web:' + tag
+            service['image'] = repository + '/ami/ami-web:' + tag
             if 'config-dir' in v:
                 service['volumes'] = [v['config-dir'] + ':/etc/properties']
         else:
             if k != 'config' and k != 'register':
                 depends_on = OrderedDict()
                 depends_on['register-service'] = {"condition": "service_healthy"}
-                depends_on['config-service'] = {"condition": "service_healthy"}
+                environment_list.append('CONFIG=' + config_mode)
+                if config_mode != 'apollo':
+                    depends_on['config-service'] = {"condition": "service_healthy"}
+                else:
+                    environment_list.append('NAMESPACE=' + namespace)
+                    environment_list.append('JAVA_OPT=-Dapollo.bootstrap.namespaces=' + namespace)
+                    environment_list.append('APOLLO_PROJECT=' + project)
                 service['depends_on'] = depends_on
             else:
                 if k == 'config':
@@ -84,18 +104,19 @@ if __name__ == '__main__':
                     service['depends_on'] = depends_on
                 health_check = OrderedDict()
                 health_check['test'] = "netstat -tupan | grep LISTEN | grep 8080 && exit 0 || exit 1"
-                health_check['timeout'] = "5s"
+                health_check['timeout'] = "10s"
                 health_check['retries'] = 10
                 health_check['interval'] = "20s"
                 health_check['start_period'] = "10s"
                 service['healthcheck'] = health_check
-            service['image'] = 'image.kaifa-empower.com/ami/ami-api-' + k + '-service:' + tag
+            service['image'] = repository + '/ami/ami-api-' + k + '-service:' + tag
+
             if 'config-dir' in v:
                 service['volumes'] = [v['config-dir'] + ':/etc/properties']
-            if 'project' in v:
-                environment_list.append('PROJECT=' + v['project'])
+            if 'project_template' in v:
+                environment_list.append('PROJECT=' + v['project_template'])
             else:
-                environment_list.append('PROJECT=' + project)
+                environment_list.append('PROJECT=' + project_template)
             if 'memory' in v:
                 environment_list.append('XMX_SIZE=' + v['memory'])
             else:
