@@ -1,7 +1,12 @@
 ---
 tz: Asia/Shanghai
-project: tiger
-
+project: ivy
+#如果没有此值默认等于project
+project_template: ivy
+#如果没有此值默认为cloud-config;apollo,cloud-config
+config_mode: apollo
+#如果没有此值默认为image.kaifa-empower.com
+repository: 10.32.233.112
 web:
   tag: latest
   services:
@@ -13,20 +18,15 @@ web:
       tag: 1.0
       memory: 512m
       ex-param:
-    config:
-      tag: 1.1
-      memory: 512m
-      config-dir: /opt/docker/properties
-      ex-param:
     gateway:
       tag: 98-2019-11-21
       memory: 512m
       port: 10000
-      ex-param:
+      ex_param:
     user:
       tag: 57-2019-11-21
       memory: 512m
-      ex-param:
+      ex_param:
     cache:
       tag: 2019-09-29-454
       memory: 512m
