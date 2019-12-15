@@ -1,0 +1,16 @@
+apiVersion: route.openshift.io/v1
+kind: Route
+metadata:
+  labels:
+    app: ami
+    component: web
+  name: ami-web
+spec:
+  host: @HOST@
+  port:
+    targetPort: client
+  to:
+    kind: Service
+    name: ami-web
+    weight: 100
+  wildcardPolicy: None

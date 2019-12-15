@@ -4,24 +4,6 @@ kind: Service
 metadata:
   labels:
     app: ami
-    component: web
-  name: ami-web
-spec:
-  ports:
-    - name: client
-      port: 8080
-      protocol: TCP
-      targetPort: 8080
-  selector:
-    app: ami
-    component: web
-  type: ClusterIP
----
-apiVersion: v1
-kind: Service
-metadata:
-  labels:
-    app: ami
     component: register
   name: register-service
 spec:
@@ -40,25 +22,6 @@ kind: Service
 metadata:
   labels:
     app: ami
-    component: gateway
-  name: gateway-service
-spec:
-  externalTrafficPolicy: Cluster
-  ports:
-    - name: client
-      port: 8080
-      protocol: TCP
-      targetPort: 8080
-  selector:
-    app: ami
-    component: api-gateway-service
-  type: NodePort
----
-apiVersion: v1
-kind: Service
-metadata:
-  labels:
-    app: ami
   name: ami-hs
 spec:
   clusterIP: None
@@ -70,21 +33,3 @@ spec:
   selector:
     app: ami
   type: ClusterIP
----
-apiVersion: v1
-kind: Service
-metadata:
-  labels:
-    app: ami
-    component: ivy-app
-  name: ivy-app-service
-spec:
-  ports:
-    - name: client
-      port: 8080
-      protocol: TCP
-      targetPort: 8080
-  selector:
-    app: ami
-    component: api-ivy-app-service
-  type: NodePort
