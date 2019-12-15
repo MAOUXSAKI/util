@@ -54,7 +54,7 @@ if __name__ == '__main__':
 
     time_zone = config_yml['tz']
     project = config_yml['project']
-    if 'project_template' in config_yml['project_template']:
+    if 'project_template' in config_yml:
         project_template = config_yml['project_template']
     else:
         project_template = project
