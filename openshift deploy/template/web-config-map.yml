@@ -1,6 +1,33 @@
 apiVersion: v1
 data:
-  config.js: "const BASEURL = {\r\n    \"development\": \"http://10.32.233.253:9988/api\",\r\n    \"testing\": \"http://@ENVIRONMENT_IP@:@PORT@/api\",\r\n    \"qa\": \"@ENVIRONMENT_IP@:@PORT@/api\",\r\n    \"production\": \"https://www.tdmpsmartmeter.com:8888/api\"\r\n};\r\n\r\nconst REPORTURL = {\r\n    \"development\": \"http://10.32.233.110:10000/WebReport\",\r\n    \"testing\": \"http://10.32.233.110:10000/WebReport\",\r\n    \"qa\": \"http://10.32.233.110:8059/webroot\",\r\n    \"production\": \"https://www.tdmpsmartmeter.com:8889/WebReport\"\r\n};\r\n\r\nconst PRINT_REPORT_URL = {//报表服务地址\r\n    \"development\": \"http://10.32.233.110:10000/WebReport\",\r\n    \"testing\": \"http://10.32.233.110:10000/WebReport\",\r\n    \"qa\": \"http://10.32.233.213:8079/WebReport\",\r\n    \"production\": \"https://www.tdmpsmartmeter.com:8886/WebReport\"\r\n};\r\n\r\n\r\n\r\nconst SYSTEM_CONFIG_URL = {\r\n    \"MANUAL_OPERATION\": {\r\n        \"development\": \"http://10.32.233.98:8091/BatchOperation/ManualOperation?lang=\",\r\n        \"testing\": \"http://10.32.233.98:8091/BatchOperation/ManualOperation?lang=\",\r\n        \"qa\": \"http://10.32.233.98:8091/BatchOperation/ManualOperation?lang=\",\r\n        \"production\": \"http://10.32.233.98:8091/BatchOperation/ManualOperation?lang=\"\r\n    },\r\n    \"MAP_GOOGLE_KEY\": {\r\n        \"development\": \"AIzaSyAq4CbNAICmemui1ar2okj2FgzncG6t93s\",\r\n        \"testing\": \"AIzaSyAq4CbNAICmemui1ar2okj2FgzncG6t93s\",\r\n        \"qa\": \"AIzaSyAq4CbNAICmemui1ar2okj2FgzncG6t93s\",\r\n        \"production\": \"AIzaSyAq4CbNAICmemui1ar2okj2FgzncG6t93s\"\r\n    },\r\n    \"MAP_SERVER\": {\r\n        \"development\": \"http://10.32.233.176:9072/cgi-bin/mapserv.exe?MAP=/ms4w/apps/osm/basemaps/osm-google.map\",\r\n        \"testing\": \"http://10.32.233.176:9072/cgi-bin/mapserv.exe?MAP=/ms4w/apps/osm/basemaps/osm-google.map\",\r\n        \"qa\": \"http://10.32.233.176:9072/cgi-bin/mapserv.exe?MAP=/ms4w/apps/osm/basemaps/osm-google.map\",\r\n        \"production\": \"http://10.32.233.176:9072/cgi-bin/mapserv.exe?MAP=/ms4w/apps/osm/basemaps/osm-google.map\"\r\n    },\r\n    \"STORAGE_REFRESH\": {\r\n        \"development\": true,\r\n        \"testing\": true,\r\n        \"qa\": true,\r\n        \"production\": true\r\n    },\r\n    \"USER_MANUAL\":\"tiger\",\r\n    \"PAGE_CACHE\": true\r\n};"
+  config.js: |
+    const BASEURL = {
+        "qa": "@ENVIRONMENT_IP@:@PORT@/api"
+    };
+
+    const REPORTURL = {
+      "qa": "@REPORT_URL@"
+    };
+
+    const PRINT_REPORT_URL = {//报表服务地址
+      "qa": "@REPORT_URL@"
+    };
+      const SYSTEM_CONFIG_URL = {
+      "MANUAL_OPERATION": {
+        "qa": "http://10.32.233.98:8091/BatchOperation/ManualOperation?lang="
+      },
+      "MAP_GOOGLE_KEY": {
+        "qa": "AIzaSyAq4CbNAICmemui1ar2okj2FgzncG6t93s"
+      },
+      "MAP_SERVER": {
+        "qa": "http://10.32.233.176:9072/cgi-bin/mapserv.exe?MAP=/ms4w/apps/osm/basemaps/osm-google.map"
+      },
+      "STORAGE_REFRESH": {
+        "qa": true
+      },
+      "USER_MANUAL":"dolphin",
+      "PAGE_CACHE": true
+    };
 kind: ConfigMap
 metadata:
   name: ami-web-properties
