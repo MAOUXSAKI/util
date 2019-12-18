@@ -101,6 +101,7 @@ class Service:
         self.volumes = []
         self.namespace = ""
         self.apollo_meta = ""
+        self.request_memory = ""
 
     def set_info(self, code, data):
         self.code = code
@@ -115,6 +116,7 @@ class Service:
         self.memory = data.get('memory', '512m')
         self.project_template = data.get('project_template', self.project)
         self.volumes = data.get('volumes')
+        self.request_memory = self.memory.upper()
 
     def generate_openshift_file(self):
         target_file_name = "target/ami-" + self.name + ".yml"
@@ -144,6 +146,7 @@ class Service:
             replace(target_file_name, "@NAMESPACE@", self.namespace)
             replace(target_file_name, "@PROJECT_CLUSTER@", self.project)
             replace(target_file_name, "@APOLLO_META@", self.apollo_meta)
+            replace(target_file_name, "@REQUEST_MEMORY@", self.request_memory)
 
 
 class Project:

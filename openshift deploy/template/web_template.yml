@@ -11,6 +11,7 @@ spec:
       app: ami
       component: web
   serviceName: ami-hs
+  replicas: 0
   template:
     metadata:
       labels:

@@ -4,6 +4,7 @@ project_template: ivy
 config_mode: apollo
 repository: 10.32.233.112
 env: DEV
+report: http://10.32.233.110:8059/webroot
 web:
   services:
     web:
