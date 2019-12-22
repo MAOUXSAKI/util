@@ -1,5 +1,3 @@
-from openpyxl.comments import Comment
-from openpyxl import load_workbook
 from copy import copy
 
 class ExcelData:
