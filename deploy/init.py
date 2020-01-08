@@ -26,7 +26,7 @@ def ordered_yaml_load(yaml_path, Loader=yaml.Loader,
     OrderedLoader.add_constructor(
         yaml.resolver.BaseResolver.DEFAULT_MAPPING_TAG,
         construct_mapping)
-    with open(yaml_path,encoding='UTF-8') as stream:
+    with open(yaml_path, encoding='UTF-8') as stream:
         return yaml.load(stream, OrderedLoader)
 
 
@@ -43,11 +43,34 @@ def ordered_yaml_dump(data, stream=None, Dumper=yaml.SafeDumper, **kwds):
     return yaml.dump(data, stream, OrderedDumper, **kwds)
 
 
-if __name__ == '__main__':
-    mkdir('/data/ami')
-    config_yml = ordered_yaml_load("/etc/config.yml")
-    docker_compose_file = open("/data/ami/docker-compose.yml", "w")
+def generate_hes(data):
+    hes_services = OrderedDict()
+    hes_repository = repository + '/hes'
+    for k, v in data.items():
+        environment_list = []
+        environment_list.append('TZ=' + time_zone)
+        environment_list.append('CONFIG=LOCAL')
+        service = OrderedDict()
+        tag = v.get('tag', 'latest')
+        port = v.get('port', None)
+        config_dir = v.get('config-dir', None)
+        hostname = v.get('hostname', 'hes')
+        service['image'] = hes_repository + '/' + k + ':' + str(tag)
+        service['restart'] = 'always'
+        service['hostname'] = hostname
+        if port:
+            service['ports'] = [str(port) + ':8080']
+        service['environment'] = environment_list
+        if config_dir:
+            service['volumes'] = [config_dir]
+        hes_services[k] = service
+    return hes_services
 
+
+if __name__ == '__main__':
+    mkdir('ami')
+    config_yml = ordered_yaml_load("config.yml")
+    docker_compose_file = open("ami/docker-compose.yml", "w")
 
     docker_compose = OrderedDict()
     docker_compose['version'] = '2.3'
@@ -70,6 +93,8 @@ if __name__ == '__main__':
         namespace = 'infrastructure,dateformat,external-api,web-other'
 
     web_services = config_yml['web']['services']
+
+    hes = config_yml.get('hes', None)
 
     tag = str(config_yml['web']['tag'])
 
@@ -126,6 +151,9 @@ if __name__ == '__main__':
             service['ports'] = [str(v['port']) + ':8080']
         service['restart'] = 'always'
         services[k + '-service'] = service
+
+    if hes:
+        services.update(generate_hes(hes['services']))
 
     docker_compose['services'] = services
 
