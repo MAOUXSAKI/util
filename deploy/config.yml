@@ -39,3 +39,14 @@ web:
       tag: 70-2019-11-21
     archive:
       tag: develop-49-2019-11-21
+
+hes:
+  services:
+    hes-core:
+      tag: 123
+      config-dir: /etc/docker
+      port: 7000
+    hes-api:
+      tag: 123
+      config-dir: /etc/docker/core
+      port: 9999

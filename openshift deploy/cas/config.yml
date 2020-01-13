@@ -1,15 +1,15 @@
 tz: Asia/Shanghai
-project: ivy
-project_template: ivy
+project: cas
+project_template: cas
 config_mode: apollo
 repository: 10.32.233.112
 env: DEV
-report: http://10.32.233.110:8059/webroot
+report: http://10.32.233.110:10004/webroot
 web:
   services:
     web:
       tag: 2.0.11.0-F2019-12-10-404
-      port: 32764
+      port: 30050
     register:
       tag: 1.0
       memory: 512m
@@ -17,7 +17,7 @@ web:
     gateway:
       tag: 2.0.11.0-F2019-12-04-109
       memory: 512m
-      port: 32766
+      port: 30051
     archive:
       tag: 2.0.10.0-F2019-12-11-106
     big-data:
@@ -26,18 +26,18 @@ web:
       tag: 2.0.11.0-F2019-12-09-123
     ivy-app:
       tag: 2.0.10.0F2019-11-29-26
-      port: 32765
+      port: 30052
     ivy:
       tag: 2.0.11.0-F2019-12-04-66
     job:
       tag: 2.0.11.0-F2019-12-13-85
     mdm:
       tag: 2.0.11.0-F2019-12-11-56
+      project_template: ivy
       memory: 512m
     system:
       tag: 2.0.11.0-F2019-12-04-37
-    smart-app:
-      tag: 2.0.11.0-F2019-12-04-16
+      project_template: ivy_cas
 
 
 

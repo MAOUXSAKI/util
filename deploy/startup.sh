@@ -1,5 +1,36 @@
 #!/usr/bin/env bash
-[[ -z $1 ]] && version=0.5
-[[ -z $1 ]] || version=$1
+while_loop=0
+while getopts "wv:" opt; do
+  case $opt in
+    w)
+      while_loop=1
+      ;;
+    b)
+    version=$OPTARG
+    ;;
+    \?)
+      echo "Invalid option: -$OPTARG"
+      ;;
+  esac
+done
+
+[[ -z $version ]] && version=0.61
+
 docker run --rm --privileged=true -v `pwd`/config.yml:/etc/config.yml -v `pwd`/docker-compose:/data image.kaifa-empower.com/library/init:$version
+
+if [[ $while_loop -eq 1 ]];then
+    while [ 0 -eq 0 ]
+    do
+       {
+         docker pull docker-compose/ami/docker-compose.yml && flag=1
+       } || {
+         flag=0
+       }
+       if [ $flag -eq 1 ];then
+         break
+       else
+         echo pull fail
+       fi
+    done
+fi
 docker-compose -f docker-compose/ami/docker-compose.yml up -d

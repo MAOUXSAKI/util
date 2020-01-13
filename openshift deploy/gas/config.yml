@@ -1,0 +1,38 @@
+tz: Asia/Shanghai
+project: gas
+project_template: gas
+config_mode: apollo
+repository: 10.32.233.112
+env: DEV
+report: http://10.32.233.110:10000/WebReport
+web:
+  services:
+    web:
+      tag: 2.0.10.0-373
+      port: 30041
+    register:
+      tag: 1.0
+      memory: 512m
+      ex-param:
+    archive:
+      tag: 2.0.10.0-F2019-12-06-90
+    gas:
+      tag: 2.0.10.0-F2019-12-06-32
+    gateway:
+      tag: 2.0.10.0-F2019-12-03-108
+      port: 31595
+    hes:
+      tag: 2.0.10.0-F2019-12-03-103
+    job:
+      tag: 2.0.10.0-F2019-12-06-58
+    mdm:
+      tag: 2.0.10.0-F2019-12-03-44
+      memory: 512m
+    system:
+      tag: 2.0.10.0-F2019-12-03-32
+    user:
+      tag: 2.0.10.0-F2019-12-03-77
+
+
+
+

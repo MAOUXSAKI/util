@@ -1,7 +1,7 @@
 from collections import OrderedDict
 import yaml
 import shutil
-import os
+import os, sys
 
 environment_config_list = {
     "DEV": "http://10.32.233.112:8080",
@@ -101,6 +101,7 @@ class Service:
         self.volumes = []
         self.namespace = ""
         self.apollo_meta = ""
+        self.request_memory = ""
 
     def set_info(self, code, data):
         self.code = code
@@ -108,31 +109,24 @@ class Service:
             self.name = "api-" + code + "-service"
         else:
             self.name = code
-        if "port" in data:
-            self.port = data["port"]
-        if "config-dir" in data:
-            self.config = data["config-dir"]
-        if 'tag' in data:
-            self.tag = data['tag']
+        self.port = data.get('port')
+        self.config = data.get("config-dir")
+        self.tag = data.get('tag')
         self.image = self.repository + "/ami/ami-" + self.name + ":" + str(self.tag)
-        if 'memory' in data:
-            self.memory = data['memory']
-        if 'project_template' in data:
-            self.project_template = data['project_template']
-        elif 'project' in data:
-            self.project_template = data['project']
-        if "volumes" in data:
-            self.volumes = data['volumes']
+        self.memory = data.get('memory', '512m')
+        self.project_template = data.get('project_template', self.project)
+        self.volumes = data.get('volumes')
+        self.request_memory = self.memory.upper()
 
     def generate_openshift_file(self):
         target_file_name = "target/ami-" + self.name + ".yml"
         service_file_name = "target/service-" + self.name + ".yml"
-        if self.port != "":
+        if self.port:
             shutil.copyfile("template/service_template.yml", service_file_name)
-            replace(service_file_name,"@PORT@",str(self.port))
+            replace(service_file_name, "@PORT@", str(self.port))
             replace(service_file_name, "@NAME@", self.name)
         if self.code == "web":
-            shutil.copyfile("template/web_template.yml",target_file_name)
+            shutil.copyfile("template/web_template.yml", target_file_name)
             replace("target/ami-web.yml", "@IMAGE@", self.image)
             replace("target/ami-web.yml", "@TIME_ZONE@", self.time_zone)
         else:
@@ -152,6 +146,7 @@ class Service:
             replace(target_file_name, "@NAMESPACE@", self.namespace)
             replace(target_file_name, "@PROJECT_CLUSTER@", self.project)
             replace(target_file_name, "@APOLLO_META@", self.apollo_meta)
+            replace(target_file_name, "@REQUEST_MEMORY@", self.request_memory)
 
 
 class Project:
@@ -165,33 +160,16 @@ class Project:
             self.namespace = ""
             self.apollo_meta = ""
             self.env = ""
+            self.report = ""
         else:
             self.project = config['project']
-            if 'project_template' in config:
-                self.project_template = config['project_template']
-            else:
-                self.project_template = self.project
-            if 'config_mode' in config:
-                self.config_mode = config['config_mode']
-            else:
-                self.config_mode = "cloud-config"
-            if 'repository' in config:
-                self.repository = config['repository']
-            else:
-                self.repository = "image.kaifa-empower.com"
-            if 'namespace' in config:
-                self.namespace = config['namespace']
-            else:
-                self.namespace = "infrastructure,dateformat,external-api,web-other"
-            if 'env' in config:
-                self.env = config['env']
-            else:
-                self.env = "DEV"
-
-            if 'apollo_meta' in config:
-                self.apollo_meta = config['apollo_meta']
-            else:
-                self.apollo_meta = environment_config_list[self.env]
+            self.project_template = config.get('project_template', self.project)
+            self.config_mode = config.get('config_mode', 'cloud-config')
+            self.repository = config.get('repository', "image.kaifa-empower.com")
+            self.namespace = config.get('namespace', "infrastructure,dateformat,external-api,web-other")
+            self.env = config.get('env', 'DEV')
+            self.apollo_meta = config.get('apollo_meta', environment_config_list[self.env])
+            self.report = config.get('report', "http://10.32.233.110:8059/webroot")
 
             self.time_zone = config['tz']
             self.web = config['web']
@@ -213,13 +191,18 @@ class Project:
         mkdir("target")
         shutil.copyfile("template/web-config-map.yml", "target/web-config-map.yml")
         shutil.copyfile("template/web-router.yml", "target/web-router.yml")
-        replace("target/web-config-map.yml","@ENVIRONMENT_IP@",environment_ip_list[self.env])
-        replace("target/web-router.yml","@HOST@",self.project + environment_url_list[self.env])
+        replace("target/web-config-map.yml", "@ENVIRONMENT_IP@", environment_ip_list[self.env])
+        replace("target/web-config-map.yml", "@REPORT_URL@", self.report)
+        replace("target/web-router.yml", "@HOST@", self.project + environment_url_list[self.env])
         shutil.copyfile("template/service.yml", "target/service.yml")
         for service in self.service_list:
             service.generate_openshift_file()
 
 
-config_yml = ordered_yaml_load("config.yml")
+if len(sys.argv) > 1:
+    config_file = "%s/config.yml" % sys.argv[1]
+else:
+    config_file = "config.yml"
+config_yml = ordered_yaml_load(config_file)
 project = Project(config_yml)
 project.generate_openshift_file()

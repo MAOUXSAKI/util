@@ -11,6 +11,7 @@ spec:
       app: ami
       component: @NAME@
   serviceName: ami-hs
+  replicas: 0
   template:
     metadata:
       labels:
@@ -77,4 +78,4 @@ spec:
             timeoutSeconds: 10
           resources:
             requests:
-              memory: @MEMORY@
+              memory: @REQUEST_MEMORY@

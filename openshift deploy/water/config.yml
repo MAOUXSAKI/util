@@ -1,0 +1,39 @@
+tz: Asia/Shanghai
+project: water
+project_template: water
+config_mode: apollo
+repository: 10.32.233.112
+env: DEV
+report: http://10.32.233.213:8079/WebReport
+web:
+  tag: latest
+  services:
+    web:
+      tag: 2.0.10.0-F2019-12-07-399
+      port: 30020
+    gateway:
+      tag: test_zipkin-F2019-12-12-116
+      port: 30021
+    register:
+      tag: 1.0
+    archive:
+      tag: 2.0.10.0-F2019-12-08-100
+    water:
+      tag: 2.0.10.0F2019-11-29-25
+    hes:
+      tag: 2.0.10.0-F2019-12-09-119
+    job:
+      tag: 2.0.10.0-F2019-12-07-63
+    mdm:
+      tag: 2.0.10.0-F2019-12-10-53
+      memory: 512m
+    prepay:
+      tag: 2.0.11.0-F2019-12-09-7
+    system:
+      tag: 2.0.11.0-F2019-12-04-37
+    user:
+      tag: 2.0.10.0-F2019-12-08-78
+
+
+
+
