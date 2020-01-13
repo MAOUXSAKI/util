@@ -54,7 +54,7 @@ def generate_hes(data):
         tag = v.get('tag', 'latest')
         port = v.get('port', None)
         config_dir = v.get('config-dir', None)
-        hostname = v.get('hostname', 'hes')
+        hostname = v.get('hostname', k)
         service['image'] = hes_repository + '/' + k + ':' + str(tag)
         service['restart'] = 'always'
         service['hostname'] = hostname
@@ -68,9 +68,9 @@ def generate_hes(data):
 
 
 if __name__ == '__main__':
-    mkdir('ami')
-    config_yml = ordered_yaml_load("config.yml")
-    docker_compose_file = open("ami/docker-compose.yml", "w")
+    mkdir('/data/ami')
+    config_yml = ordered_yaml_load("/etc/config.yml")
+    docker_compose_file = open("/data/ami/docker-compose.yml", "w")
 
     docker_compose = OrderedDict()
     docker_compose['version'] = '2.3'
@@ -92,65 +92,65 @@ if __name__ == '__main__':
     else:
         namespace = 'infrastructure,dateformat,external-api,web-other'
 
-    web_services = config_yml['web']['services']
+    web = config_yml.get('web',None)
 
     hes = config_yml.get('hes', None)
 
-    tag = str(config_yml['web']['tag'])
-
     services = OrderedDict()
 
-    for k, v in web_services.items():
-        if 'tag' in v:
-            tag = str(v['tag'])
-        environment_list = []
-        environment_list.append('TZ=' + time_zone)
-        service = OrderedDict()
-        if k == 'web':
-            service['image'] = repository + '/ami/ami-web:' + tag
-            if 'config-dir' in v:
-                service['volumes'] = [v['config-dir'] + ':/etc/properties']
-        else:
-            if k != 'config' and k != 'register':
-                depends_on = OrderedDict()
-                depends_on['register-service'] = {"condition": "service_healthy"}
-                environment_list.append('CONFIG=' + config_mode)
-                if config_mode != 'apollo':
-                    depends_on['config-service'] = {"condition": "service_healthy"}
-                else:
-                    environment_list.append('NAMESPACE=' + namespace)
-                    environment_list.append('JAVA_OPT=-Dapollo.bootstrap.namespaces=' + namespace)
-                    environment_list.append('APOLLO_PROJECT=' + project)
-                service['depends_on'] = depends_on
+    if web:
+        tag = str(web.get('tag','latest'))
+        for k, v in web['services'].items():
+            if 'tag' in v:
+                tag = str(v['tag'])
+            environment_list = []
+            environment_list.append('TZ=' + time_zone)
+            service = OrderedDict()
+            if k == 'web':
+                service['image'] = repository + '/ami/ami-web:' + tag
+                if 'config-dir' in v:
+                    service['volumes'] = [v['config-dir'] + ':/etc/properties']
             else:
-                if k == 'config':
+                if k != 'config' and k != 'register':
                     depends_on = OrderedDict()
                     depends_on['register-service'] = {"condition": "service_healthy"}
+                    environment_list.append('CONFIG=' + config_mode)
+                    if config_mode != 'apollo':
+                        depends_on['config-service'] = {"condition": "service_healthy"}
+                    else:
+                        environment_list.append('NAMESPACE=' + namespace)
+                        environment_list.append('JAVA_OPT=-Dapollo.bootstrap.namespaces=' + namespace)
+                        environment_list.append('APOLLO_PROJECT=' + project)
                     service['depends_on'] = depends_on
-                health_check = OrderedDict()
-                health_check['test'] = "netstat -tupan | grep LISTEN | grep 8080 && exit 0 || exit 1"
-                health_check['timeout'] = "10s"
-                health_check['retries'] = 10
-                health_check['interval'] = "20s"
-                health_check['start_period'] = "10s"
-                service['healthcheck'] = health_check
-            service['image'] = repository + '/ami/ami-api-' + k + '-service:' + tag
+                else:
+                    if k == 'config':
+                        depends_on = OrderedDict()
+                        depends_on['register-service'] = {"condition": "service_healthy"}
+                        service['depends_on'] = depends_on
+                    health_check = OrderedDict()
+                    health_check['test'] = "netstat -tupan | grep LISTEN | grep 8080 && exit 0 || exit 1"
+                    health_check['timeout'] = "10s"
+                    health_check['retries'] = 10
+                    health_check['interval'] = "20s"
+                    health_check['start_period'] = "10s"
+                    service['healthcheck'] = health_check
+                service['image'] = repository + '/ami/ami-api-' + k + '-service:' + tag
 
-            if 'config-dir' in v:
-                service['volumes'] = [v['config-dir'] + ':/etc/properties']
-            if 'project_template' in v:
-                environment_list.append('PROJECT=' + v['project_template'])
-            else:
-                environment_list.append('PROJECT=' + project_template)
-            if 'memory' in v:
-                environment_list.append('XMX_SIZE=' + v['memory'])
-            else:
-                environment_list.append('XMX_SIZE=512m')
-        service['environment'] = environment_list
-        if 'port' in v:
-            service['ports'] = [str(v['port']) + ':8080']
-        service['restart'] = 'always'
-        services[k + '-service'] = service
+                if 'config-dir' in v:
+                    service['volumes'] = [v['config-dir'] + ':/etc/properties']
+                if 'project_template' in v:
+                    environment_list.append('PROJECT=' + v['project_template'])
+                else:
+                    environment_list.append('PROJECT=' + project_template)
+                if 'memory' in v:
+                    environment_list.append('XMX_SIZE=' + v['memory'])
+                else:
+                    environment_list.append('XMX_SIZE=512m')
+            service['environment'] = environment_list
+            if 'port' in v:
+                service['ports'] = [str(v['port']) + ':8080']
+            service['restart'] = 'always'
+            services[k + '-service'] = service
 
     if hes:
         services.update(generate_hes(hes['services']))
