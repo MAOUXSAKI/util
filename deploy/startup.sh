@@ -16,13 +16,13 @@ done
 
 [[ -z $version ]] && version=0.61
 
-docker run --rm --privileged=true -v `pwd`/config.yml:/etc/config.yml -v `pwd`/docker-compose:/data image.kaifa-empower.com/library/init:$version
+docker run --rm --privileged=true -v `pwd`/config.yml:/etc/config.yml -v `pwd`/docker-compose:/data 10.32.233.112/library/init:$version
 
 if [[ $while_loop -eq 1 ]];then
     while [ 0 -eq 0 ]
     do
        {
-         docker pull docker-compose/ami/docker-compose.yml && flag=1
+         docker-compose -f docker-compose/ami/docker-compose.yml pull && flag=1
        } || {
          flag=0
        }
