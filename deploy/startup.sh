@@ -20,8 +20,9 @@ while getopts "wv:" opt; do
   esac
 done
 
-[[ -z $version ]] && version=0.62
+[[ -z $version ]] && version=latest
 
+docker pull $repository/library/init:$version
 docker run --rm --privileged=true -v `pwd`/config.yml:/etc/config.yml -v `pwd`/docker-compose:/data $repository/library/init:$version
 
 if [[ $while_loop -eq 1 ]];then
