@@ -1,7 +1,11 @@
 #!/usr/bin/env bash
 while_loop=0
-local_ip=`ifconfig eth0 | grep "inet addr" | awk '{ print $2}' | awk -F: '{print $2}'`
-if [[ "$local_ip" == 10.32.*  ]];then
+local_ip=`ifconfig eth0|grep inet|grep -v 127.0.0.1|grep -v inet6|awk '{print $3}'|tr -d "addr:"`
+if [[ $local_ip == netmsk ]];then
+  local_ip=`ifconfig eth0|grep inet|grep -v 127.0.0.1|grep -v inet6|awk '{print $2}'|tr -d "addr:"`
+fi
+echo $local_ip
+if [[ $local_ip == 10.32.*  ]];then
   repository=10.32.233.112
 else
     repository=image.kaifa-empower.com
