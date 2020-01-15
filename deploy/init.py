@@ -68,9 +68,9 @@ def generate_hes(data):
 
 
 if __name__ == '__main__':
-    mkdir('ami')
-    config_yml = ordered_yaml_load("config.yml")
-    docker_compose_file = open("ami/docker-compose.yml", "w")
+    mkdir('/data/ami')
+    config_yml = ordered_yaml_load("/etc/config.yml")
+    docker_compose_file = open("/data/ami/docker-compose.yml", "w")
 
     docker_compose = OrderedDict()
     docker_compose['version'] = '2.3'
