@@ -1,2 +1,3 @@
+#!/usr/bin/env bash
 cd /root
-python3 init.py
+python3 init.py $repository

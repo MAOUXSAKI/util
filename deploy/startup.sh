@@ -1,11 +1,17 @@
 #!/usr/bin/env bash
 while_loop=0
+local_ip=`ifconfig eth0 | grep "inet addr" | awk '{ print $2}' | awk -F: '{print $2}'`
+if [[ "$local_ip" == 10.32.*  ]];then
+  repository=10.32.233.112
+else
+    repository=image.kaifa-empower.com
+fi
 while getopts "wv:" opt; do
   case $opt in
     w)
       while_loop=1
       ;;
-    b)
+    v)
     version=$OPTARG
     ;;
     \?)
@@ -14,9 +20,9 @@ while getopts "wv:" opt; do
   esac
 done
 
-[[ -z $version ]] && version=0.61
+[[ -z $version ]] && version=0.62
 
-docker run --rm --privileged=true -v `pwd`/config.yml:/etc/config.yml -v `pwd`/docker-compose:/data 10.32.233.112/library/init:$version
+docker run --rm --privileged=true -v `pwd`/config.yml:/etc/config.yml -v `pwd`/docker-compose:/data $repository/library/init:$version
 
 if [[ $while_loop -eq 1 ]];then
     while [ 0 -eq 0 ]
