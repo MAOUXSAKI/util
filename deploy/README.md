@@ -1,1 +1,4 @@
-docker run --rm --privileged=true -v `pwd`/config.yml:/etc/config.yml -v `pwd`/docker-compose:/data image.kaifa-empower.com/library/init:0.4
+运行时使用start.sh脚本
+参数：
+-w : 无限重试次数拉取镜像
+-v $version :初始化镜像版本号，默认0.61 

@@ -5,8 +5,6 @@ project: ivy
 project_template: ivy
 #如果没有此值默认为cloud-config;apollo,cloud-config
 config_mode: apollo
-#如果没有此值默认为image.kaifa-empower.com
-repository: 10.32.233.112
 web:
   tag: latest
   services:

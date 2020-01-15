@@ -1,5 +1,5 @@
 from collections import OrderedDict
-import yaml
+import yaml,sys
 
 
 def mkdir(path):
@@ -62,7 +62,7 @@ def generate_hes(data):
             service['ports'] = [str(port) + ':8080']
         service['environment'] = environment_list
         if config_dir:
-            service['volumes'] = [config_dir]
+            service['volumes'] = [config_dir + ':/etc/local']
         hes_services[k] = service
     return hes_services
 
@@ -81,7 +81,12 @@ if __name__ == '__main__':
         project_template = config_yml['project_template']
     else:
         project_template = project
-    repository = config_yml['repository']
+
+    if len(sys.argv) > 2 and sys.argv[1]:
+        repository = sys.argv[1]
+    else:
+        repository = config_yml.get('repository', "image.kaifa-empower.com")
+
     if 'config_mode' in config_yml:
         config_mode = config_yml['config_mode']
     else:
