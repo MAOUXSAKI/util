@@ -11,8 +11,8 @@ environment_config_list = {
 }
 
 environment_ip_list = {
-    "DEV": "http://10.32.233.12",
-    "QA": "http://10.32.233.31"
+    "DEV": "10.32.233.12",
+    "QA": "10.32.233.31"
 }
 
 environment_url_list = {
@@ -84,7 +84,14 @@ def replace(file_path, old_str, new_str):
         print(e)
 
 
-class Service:
+def generate_cs_file(service):
+    service_file_name = "target/service-" + service.name + ".yml"
+    shutil.copyfile("template/service_template.yml", service_file_name)
+    replace(service_file_name, "@PORT@", str(service.port))
+    replace(service_file_name, "@NAME@", service.name)
+
+
+class WebService:
     def __init__(self):
         self.repository = ""
         self.code = ""
@@ -103,7 +110,14 @@ class Service:
         self.apollo_meta = ""
         self.request_memory = ""
 
-    def set_info(self, code, data):
+    def set_info(self, code, data, system):
+        self.apollo_meta = system.apollo_meta
+        self.repository = system.repository
+        self.project = system.project
+        self.project_template = system.project_template
+        self.time_zone = system.time_zone
+        self.config_mode = system.config_mode
+        self.namespace = system.namespace
         self.code = code
         if code != "web":
             self.name = "api-" + code + "-service"
@@ -114,17 +128,18 @@ class Service:
         self.tag = data.get('tag')
         self.image = self.repository + "/ami/ami-" + self.name + ":" + str(self.tag)
         self.memory = data.get('memory', '512m')
-        self.project_template = data.get('project_template', self.project)
+        project_template = data.get('project_template',None)
+        if not project_template and not self.project_template:
+            self.project_template = self.project
+        elif project_template:
+            self.project_template = project_template
         self.volumes = data.get('volumes')
         self.request_memory = self.memory.upper()
 
     def generate_openshift_file(self):
         target_file_name = "target/ami-" + self.name + ".yml"
-        service_file_name = "target/service-" + self.name + ".yml"
         if self.port:
-            shutil.copyfile("template/service_template.yml", service_file_name)
-            replace(service_file_name, "@PORT@", str(self.port))
-            replace(service_file_name, "@NAME@", self.name)
+            generate_cs_file(self)
         if self.code == "web":
             shutil.copyfile("template/web_template.yml", target_file_name)
             replace("target/ami-web.yml", "@IMAGE@", self.image)
@@ -147,6 +162,139 @@ class Service:
             replace(target_file_name, "@PROJECT_CLUSTER@", self.project)
             replace(target_file_name, "@APOLLO_META@", self.apollo_meta)
             replace(target_file_name, "@REQUEST_MEMORY@", self.request_memory)
+
+
+class HesService:
+    def __init__(self):
+        self.repository = ""
+        self.code = ""
+        self.name = ""
+        self.tag = ""
+        self.image = ""
+        self.time_zone = "Asia/Shanghai"
+        self.memory = "512m"
+        self.port = ""
+        self.request_memory = ""
+
+    def set_info(self, code, data, system):
+        self.name = code
+        self.repository = system.repository
+        self.time_zone = system.time_zone
+        self.code = code
+        self.port = data.get('port')
+        self.tag = data.get('tag')
+        self.image = self.repository + "/hes/" + self.name + ":" + str(self.tag)
+        self.memory = data.get('memory', '512m')
+        self.request_memory = self.memory.upper()
+
+    def generate_openshift_file(self):
+        target_file_name = "target/ami-" + self.name + ".yml"
+        if self.port:
+            generate_cs_file(self)
+        if self.code == "hes-core":
+            shutil.copyfile("template/hes-core_template.yml", target_file_name)
+            replace("target/ami-hes-core.yml", "@IMAGE@", self.image)
+            replace("target/ami-hes-core.yml", "@TIME_ZONE@", self.time_zone)
+        elif self.code == "hes-api":
+            shutil.copyfile("template/hes-api_template.yml", target_file_name)
+            replace("target/ami-hes-api.yml", "@IMAGE@", self.image)
+            replace("target/ami-hes-api.yml", "@TIME_ZONE@", self.time_zone)
+
+
+class KafkaService:
+    def __init__(self):
+        self.repository = ""
+        self.code = ""
+        self.name = ""
+        self.tag = ""
+        self.image = ""
+        self.time_zone = "Asia/Shanghai"
+        self.port = ""
+        self.out_ip = ""
+
+    def set_info(self, code, data, system):
+        self.name = code
+        self.repository = system.repository
+        self.time_zone = system.time_zone
+        self.code = code
+        self.port = data.get('port', None)
+        if not self.port:
+            raise Exception("Kafka should has port")
+        self.tag = data.get('tag', "2.11-2.3.0")
+        if not self.tag:
+            self.tag = "2.11-2.3.0"
+        self.image = self.repository + "/library/kubernetes-kafka:" + str(self.tag)
+        self.out_ip = environment_ip_list[system.env]
+
+    def generate_openshift_file(self):
+        target_file_name = "target/kafka.yml"
+        shutil.copyfile("template/kafka_template.yml", target_file_name)
+        replace(target_file_name, "@IMAGE@", self.image)
+        replace(target_file_name, "@TIME_ZONE@", self.time_zone)
+        replace(target_file_name, "@OUT_IP@", self.out_ip)
+        replace(target_file_name, "@PORT@", str(self.port))
+
+
+class ZookeeperService:
+    def __init__(self):
+        self.repository = ""
+        self.code = ""
+        self.name = ""
+        self.tag = ""
+        self.image = ""
+        self.time_zone = "Asia/Shanghai"
+        self.port = ""
+
+    def set_info(self, code, data, system):
+        self.name = code
+        self.repository = system.repository
+        self.time_zone = system.time_zone
+        self.code = code
+        self.port = data.get('port', None)
+        if not self.port:
+            raise Exception("zookeeper should has port")
+        self.tag = data.get('tag', "1.0-3.4.10")
+        if not self.tag:
+            self.tag = "1.0-3.4.10"
+        self.image = self.repository + "/deploy/kubernetes-zookeeper:" + str(self.tag)
+
+    def generate_openshift_file(self):
+        target_file_name = "target/zookeeper.yml"
+        shutil.copyfile("template/zookeeper.yml", target_file_name)
+        replace(target_file_name, "@IMAGE@", self.image)
+        replace(target_file_name, "@TIME_ZONE@", self.time_zone)
+        replace(target_file_name, "@PORT@", str(self.port))
+
+class RedisService:
+    def __init__(self):
+        self.repository = ""
+        self.code = ""
+        self.name = ""
+        self.tag = ""
+        self.image = ""
+        self.time_zone = "Asia/Shanghai"
+        self.port = ""
+        self.password = ''
+
+    def set_info(self, code, data, system):
+        self.name = code
+        self.repository = system.repository
+        self.time_zone = system.time_zone
+        self.code = code
+        self.password = data.get('password','kaifa123')
+        self.port = data.get('port', None)
+        if not self.port:
+            raise Exception("redis should has port")
+        self.tag = data.get('tag', "5.0.4")
+        self.image = self.repository + "/library/redis:" + str(self.tag)
+
+    def generate_openshift_file(self):
+        target_file_name = "target/redis.yml"
+        shutil.copyfile("template/redis_template.yml", target_file_name)
+        replace(target_file_name, "@IMAGE@", self.image)
+        replace(target_file_name, "@TIME_ZONE@", self.time_zone)
+        replace(target_file_name, "@PORT@", str(self.port))
+        replace(target_file_name, "@PASSWORD@", str(self.password))
 
 
 class Project:
@@ -172,26 +320,41 @@ class Project:
             self.report = config.get('report', "http://10.32.233.110:8059/webroot")
 
             self.time_zone = config['tz']
-            self.web = config['web']
             self.service_list = []
-            for k, v in self.web['services'].items():
-                service = Service()
-                service.apollo_meta = self.apollo_meta
-                service.repository = self.repository
-                service.project = self.project
-                service.project_template = self.project_template
-                service.time_zone = self.time_zone
-                service.config_mode = self.config_mode
-                service.namespace = self.namespace
-                service.set_info(k, v)
-                self.service_list.append(service)
+            self.web = config.get('web', None)
+            if self.web:
+                for k, v in self.web['services'].items():
+                    web_service = WebService()
+                    web_service.set_info(k, v, self)
+                    self.service_list.append(web_service)
+            self.hes = config.get('hes', None)
+            if self.hes:
+                for k, v in self.hes['services'].items():
+                    hes_service = HesService()
+                    hes_service.set_info(k, v, self)
+                    self.service_list.append(hes_service)
+            self.kafka = config.get('kafka', None)
+            if self.kafka:
+                kafka = KafkaService()
+                kafka.set_info('kafka', self.kafka, self)
+                self.service_list.append(kafka)
+            self.zookeeper = config.get('zookeeper',None)
+            if self.zookeeper:
+                zookeeper = ZookeeperService()
+                zookeeper.set_info('zookeeper',self.zookeeper,self)
+                self.service_list.append(zookeeper)
+            self.redis = config.get('redis', None)
+            if self.redis:
+                redis = RedisService()
+                redis.set_info('redis', self.redis, self)
+                self.service_list.append(redis)
 
     def generate_openshift_file(self):
         remove_dir("target")
         mkdir("target")
         shutil.copyfile("template/web-config-map.yml", "target/web-config-map.yml")
         shutil.copyfile("template/web-router.yml", "target/web-router.yml")
-        replace("target/web-config-map.yml", "@ENVIRONMENT_IP@", environment_ip_list[self.env])
+        replace("target/web-config-map.yml", "@ENVIRONMENT_IP@", "http://" + environment_ip_list[self.env])
         replace("target/web-config-map.yml", "@REPORT_URL@", self.report)
         replace("target/web-router.yml", "@HOST@", self.project + environment_url_list[self.env])
         shutil.copyfile("template/service.yml", "target/service.yml")

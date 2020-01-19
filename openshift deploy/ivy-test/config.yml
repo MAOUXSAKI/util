@@ -3,7 +3,7 @@ project: ivy
 project_template: ivy
 config_mode: apollo
 repository: 10.32.233.112
-env: DEV
+env: QA
 report: http://10.32.233.110:8059/webroot
 web:
   services:
@@ -38,10 +38,7 @@ web:
       tag: 2.0.11.0-F2019-12-04-37
     smart-app:
       tag: 2.0.11.0-F2019-12-04-16
-    user:
-      tag: 2.0.10.0F20191227-97
-    inventory:
-      tag: 2.0.10.0F20191227-28
+
 hes:
   services:
     hes-api:
@@ -51,14 +48,6 @@ hes:
       tag: Collect-SVR3.0.1.0F20191125_70
       port: 32367
 
-kafka:
-  tag: 2.11-2.3.0
-  port: 32763
-zookeeper:
-  port: 32762
-redis:
-  port: 30077
-  password: kaifa123
 
 
 

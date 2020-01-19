@@ -1,0 +1,64 @@
+tz: Asia/Shanghai
+project: ivy01
+project_template: ivy
+config_mode: apollo
+repository: 10.32.233.112
+env: QA
+report: http://10.32.233.110:8059/webroot
+web:
+  services:
+    web:
+      tag: 2.0.10.0-F2020-01-10-466
+      port: 30070
+    register:
+      tag: 1.0
+      memory: 512m
+      ex-param:
+    gateway:
+      tag: 2.0.10.0F20200102-120-2.0.10.0
+      memory: 512m
+      port: 30071
+    archive:
+      tag: 2.0.10.0F20200106-177-2.0.10.0
+    big-data:
+      tag: 2.0.11.0F20200114-54-develop
+    hes:
+      tag: 2.0.10.0F20200106-194-2.0.10.0
+    hes-core:
+      tag: 2.0.10.0F20200102-22-2.0.10.0
+    ivy-app:
+      tag: 2.0.10.0F2019-11-29-26
+      port: 30072
+    ivy:
+      tag: 2.0.10.0F20200106-80-2.0.10.0
+    inventory:
+      tag: 2.0.10.0F20191227-29
+    job:
+      tag: 2.0.10.0F20200107-107-2.0.10.0
+    mdm:
+      tag: 2.0.10.0F20200105-96-2.0.10.0
+      memory: 512m
+    system:
+      tag: 2.0.10.0F20200105-61-2.0.10.0
+    smart-app:
+      tag: 2.0.10.0F20191222-20
+    user:
+      tag: 2.0.10.0F20200105-101-2.0.10.0
+
+hes:
+  services:
+    hes-api:
+      tag: HES-WebAPI3.0.0.21F20191205_55
+      port: 30073
+    hes-core:
+      tag: Collect-SVR3.0.1.0F20191125_70
+      port: 30074
+
+kafka:
+  tag: 2.11-2.3.0
+  port: 30075
+zookeeper:
+  port: 30076
+redis:
+  port: 30077
+  password: kaifa123

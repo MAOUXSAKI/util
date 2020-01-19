@@ -1,0 +1,53 @@
+tz: Asia/Shanghai
+project: dolphin
+project_template: dolphin
+config_mode: apollo
+repository: 10.32.233.112
+env: DEV
+report: http://10.32.233.110:8059/webroot
+web:
+  services:
+    web:
+      tag: develop-F2020-01-15-480
+      port: 30080
+    register:
+      tag: 1.0
+      memory: 512m
+      ex-param:
+    gateway:
+      tag: 2.0.11.0F20200114-122-develop
+      memory: 512m
+      port: 30081
+    archive:
+      tag: 2.0.11.0F20200114-185-develop
+    big-data:
+      tag:  2.0.11.0F20200114-54-develop
+    hes:
+      tag: 2.0.11.0F20200114-213-develop
+    ivy:
+      tag: 2.0.11.0F20200114-90-develop
+    job:
+      tag: 2.0.11.0F20200114-113-develop
+    mdm:
+      tag: 2.0.11.0F20200114-121-develop
+      memory: 512m
+    system:
+      tag: 2.0.11.0F20200114-71-develop
+
+hes:
+  services:
+    hes-api:
+      tag: HES-WebAPI3.0.0.21F20191205_55
+      port: 30083
+    hes-core:
+      tag: Collect-SVR3.0.1.0F20191125_70
+      port: 30084
+
+kafka:
+  tag: 2.11-2.3.0
+  port: 30085
+zookeeper:
+  port: 30086
+redis:
+  port: 30087
+  password: kaifa123

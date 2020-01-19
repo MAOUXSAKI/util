@@ -1,11 +1,12 @@
-ami-api-archive-service     	2.0.10.0-F2019-12-03-89
-ami-api-big-data-service     	2.0.10.0-F2019-12-13-28
+ami-api-archive-service     	2.0.10.0-F2019-12-20-115
+ami-api-big-data-service     	2.0.10.0-F2019-12-20-41
 ami-api-gateway-service     	2.0.10.0-F2019-12-03-108
 ami-api-hes-core-service     	2.0.10.0F2019-11-29-19
-ami-api-hes-service     	2.0.10.0F2019-11-29-99
+ami-api-hes-service     	2.0.10.0-F2019-12-20-142
+ami-api-ivy-service     	2.0.10.0-F2019-12-20-72
 ami-api-job-service     	2.0.10.0F2019-11-29-47
-ami-api-mdm-service     	2.0.10.0-F2019-12-18-63
+ami-api-mdm-service     	2.0.10.0-F2019-12-20-69
 ami-api-register-service     	1.0
 ami-api-system-service     	2.0.10.0F2019-11-29-29
-ami-api-user-service     	2.0.10.0F2019-11-29-70
+ami-api-user-service     	2.0.10.0-F2019-12-20-83
 ami-web     	2.0.10.0-373

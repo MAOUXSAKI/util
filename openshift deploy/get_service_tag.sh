@@ -16,6 +16,7 @@ function service_list() {
     oc get statefulset -o template --template '{{range .items}}{{.metadata.name}} {{range .spec.template.spec.containers}} {{.image}}{{end}} {{"\n"}}{{end}}' | awk '{split($2,a,":");print $1"     \t"a[2];}' > $1/service_list
 }
 
+
 oc login -u dev -p dev https://master.kaifa.develop:8443
 oc project $2
 

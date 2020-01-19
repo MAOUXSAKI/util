@@ -1,0 +1,79 @@
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: redis-standalone2
+  labels:
+    app: redis-standalone2
+spec:
+  serviceName: redis-standalone
+  replicas: 1
+  selector:
+    matchLabels:
+      app: redis-standalone2
+  template:
+    metadata:
+      labels:
+        app: redis-standalone2
+    spec:
+      containers:
+        - name: redis
+          image: 10.32.233.112/library/redis:5.0.4
+          ports:
+            - containerPort: 6379
+              name: client
+          command: ["redis-server", "--appendonly", "yes","--requirepass","@PASSWORD@"]
+          readinessProbe:
+            exec:
+              command:
+                - sh
+                - -c
+                - "redis-cli -h $(hostname) ping"
+            initialDelaySeconds: 15
+            timeoutSeconds: 5
+          livenessProbe:
+            exec:
+              command:
+                - sh
+                - -c
+                - "redis-cli -h $(hostname) ping"
+            initialDelaySeconds: 20
+            periodSeconds: 3
+          env:
+            - name: TZ
+              value: @TIME_ZONE@
+            - name: POD_IP
+              valueFrom:
+                fieldRef:
+                  fieldPath: status.podIP
+          volumeMounts:
+            - name: data
+              mountPath: /data
+              readOnly: false
+  volumeClaimTemplates:
+    - metadata:
+        name: data
+        labels:
+          name: redis-standalone
+      spec:
+        storageClassName: managed-nfs-storage
+        accessModes: [ "ReadWriteOnce" ]
+        resources:
+          requests:
+            storage: 1Gi
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: redis-standalone
+  labels:
+    app: redis-standalone
+spec:
+  ports:
+    - port: 6379
+      targetPort: 6379
+      name: client
+      nodePort: @PORT@
+  type: NodePort
+  selector:
+    app: redis-standalone2

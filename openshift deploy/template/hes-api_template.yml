@@ -1,0 +1,68 @@
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  labels:
+    app: hes
+    component: api
+  name: hes-api
+spec:
+  selector:
+    matchLabels:
+      app: hes
+      component: hes-api
+  serviceName: hes-hs
+  replicas: 0
+  template:
+    metadata:
+      labels:
+        app: hes
+        component: hes-api
+    spec:
+      affinity:
+        podAntiAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            - labelSelector:
+                matchExpressions:
+                  - key: app
+                    operator: In
+                    values:
+                      - hes
+                  - key: component
+                    operator: In
+                    values:
+                      - hes-api
+              topologyKey: kubernetes.io/hostname
+      containers:
+        - env:
+            - name: TZ
+              value: @TIME_ZONE@
+          image: @IMAGE@
+          imagePullPolicy: IfNotPresent
+          name: hes-api
+          ports:
+            - containerPort: 8080
+              name: server
+              protocol: TCP
+          resources:
+            requests:
+              cpu: 100m
+              memory: 1Gi
+          volumeMounts:
+            - mountPath: /etc/local
+              name: hes-api-configmap
+      volumes:
+        - configMap:
+            defaultMode: 420
+            name: hes-api-configmap
+          name: hes-api-configmap
+---
+apiVersion: v1
+data:
+  KAIFA.HesApi.dll.config: ""
+  ProjectSettings.json: ""
+  app.config: ""
+  appsettings.json: ""
+kind: ConfigMap
+metadata:
+  name: hes-api-configmap

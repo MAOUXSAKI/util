@@ -33,3 +33,24 @@ spec:
   selector:
     app: ami
   type: ClusterIP
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: ami
+  name: hes-hs
+spec:
+  clusterIP: None
+  ports:
+    - name: server
+      port: 8080
+      protocol: TCP
+      targetPort: 8080
+  selector:
+    app: hes
+  type: ClusterIP
+
+
+
+

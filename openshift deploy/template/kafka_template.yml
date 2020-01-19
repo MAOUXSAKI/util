@@ -1,0 +1,97 @@
+---
+apiVersion: v1
+data:
+  services: '3'
+  zoo-connect: 'zk-cs:2181'
+kind: ConfigMap
+metadata:
+  name: kafka-config
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: kafka
+spec:
+  selector:
+    matchLabels:
+      app: kafka
+  serviceName: kafka-hs
+  template:
+    metadata:
+      labels:
+        app: kafka
+    spec:
+      affinity:
+        podAntiAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            - labelSelector:
+                matchExpressions:
+                  - key: app
+                    operator: In
+                    values:
+                      - kafka
+              topologyKey: kubernetes.io/hostname
+      containers:
+        - env:
+            - name: OUT_IP
+              value: @OUT_IP@
+            - name: OUT_PORT
+              value: "@PORT@"
+            - name: TZ
+              value: @TIME_ZONE@
+            - name: ZOO_CONNECT
+              valueFrom:
+                configMapKeyRef:
+                  key: zoo-connect
+                  name: kafka-config
+            - name: SERVICES
+              valueFrom:
+                configMapKeyRef:
+                  key: services
+                  name: kafka-config
+          image: @IMAGE@
+          imagePullPolicy: IfNotPresent
+          name: kafka
+          ports:
+            - containerPort: 9092
+              name: server
+              protocol: TCP
+          resources:
+            requests:
+              cpu: 500m
+              memory: 1Gi
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: kafka
+  name: kafka-cs
+spec:
+  ports:
+    - name: server
+      port: 9092
+      protocol: TCP
+      targetPort: 9092
+      nodePort: @PORT@
+  selector:
+    app: kafka
+  type: NodePort
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: kafka
+  name: kafka-hs
+spec:
+  clusterIP: None
+  ports:
+    - name: server
+      port: 9092
+      protocol: TCP
+      targetPort: 9092
+  selector:
+    app: kafka
+  type: ClusterIP

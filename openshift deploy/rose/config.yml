@@ -24,6 +24,8 @@ web:
       memory: 1024m
     hes-core:
       tag: 2.0.10.0F2019-11-29-19
+    ivy:
+      tag: 2.0.10.0-F2019-12-20-72
     hes:
       tag: 2.0.10.0F2019-11-29-99
     job:
@@ -35,7 +37,14 @@ web:
       tag: 2.0.10.0F2019-11-29-29
     user:
       tag: 2.0.10.0F2019-11-29-70
-
+hes:
+  services:
+    hes-api:
+      tag: 3.0.1.0F20200102_Collect-SVR-RosePoc_23
+      port: 30032
+    hes-core:
+      tag: 3.0.1.0F20200102_Collect-SVR-RosePoc_23
+      port: 30033
 
 
 

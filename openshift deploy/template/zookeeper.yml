@@ -1,0 +1,121 @@
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: zk
+spec:
+  podManagementPolicy: Parallel
+  replicas: 1
+  revisionHistoryLimit: 10
+  selector:
+    matchLabels:
+      app: zk
+  serviceName: zk-hs
+  template:
+    metadata:
+      labels:
+        app: zk
+    spec:
+      affinity:
+        podAntiAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            - labelSelector:
+                matchExpressions:
+                  - key: app
+                    operator: In
+                    values:
+                      - zk
+              topologyKey: kubernetes.io/hostname
+      containers:
+        - command:
+            - sh
+            - '-c'
+            - >-
+              start-zookeeper --servers=1 --data_dir=/var/lib/zookeeper/data
+              --data_log_dir=/var/lib/zookeeper/data/log
+              --conf_dir=/opt/zookeeper/conf --client_port=2181
+              --election_port=3888 --server_port=2888 --tick_time=2000
+              --init_limit=10 --sync_limit=5 --heap=512M --max_client_cnxns=60
+              --snap_retain_count=3 --purge_interval=12
+              --max_session_timeout=40000 --min_session_timeout=4000
+              --log_level=INFO
+          env:
+            - name: TZ
+              value: @TIME_ZONE@
+          image: @IMAGE@
+          imagePullPolicy: Always
+          livenessProbe:
+            exec:
+              command:
+                - sh
+                - '-c'
+                - zookeeper-ready 2181
+            failureThreshold: 3
+            initialDelaySeconds: 10
+            periodSeconds: 10
+            successThreshold: 1
+            timeoutSeconds: 5
+          name: kubernetes-zookeeper
+          ports:
+            - containerPort: 2181
+              name: client
+              protocol: TCP
+            - containerPort: 2888
+              name: server
+              protocol: TCP
+            - containerPort: 3888
+              name: leader-election
+              protocol: TCP
+          readinessProbe:
+            exec:
+              command:
+                - sh
+                - '-c'
+                - zookeeper-ready 2181
+            failureThreshold: 3
+            initialDelaySeconds: 10
+            periodSeconds: 10
+            successThreshold: 1
+            timeoutSeconds: 5
+          resources:
+            requests:
+              cpu: 500m
+              memory: 1Gi
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: zk
+  name: zk-hs
+spec:
+  ports:
+    - name: server
+      port: 2888
+      protocol: TCP
+      targetPort: 2888
+    - name: leader-election
+      port: 3888
+      protocol: TCP
+      targetPort: 3888
+  selector:
+    app: zk
+  type: ClusterIP
+  clusterIP: None
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: zk
+  name: zk-cs
+spec:
+  ports:
+    - name: client
+      port: 2181
+      protocol: TCP
+      targetPort: 2181
+      nodePort: @PORT@
+  selector:
+    app: zk
+  type: NodePort

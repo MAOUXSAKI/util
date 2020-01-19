@@ -14,6 +14,5 @@ spec:
       targetPort: 8080
       nodePort: @PORT@
   selector:
-    app: ami
     component: @NAME@
   type: NodePort

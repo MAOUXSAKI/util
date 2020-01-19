@@ -1,0 +1,64 @@
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  labels:
+    app: hes
+    component: core
+  name: hes-core
+spec:
+  selector:
+    matchLabels:
+      app: hes
+      component: hes-core
+  serviceName: hes-hs
+  replicas: 0
+  template:
+    metadata:
+      labels:
+        app: hes
+        component: hes-core
+    spec:
+      containers:
+        - env:
+            - name: TZ
+              value: @TIME_ZONE@
+          image: @IMAGE@
+          imagePullPolicy: IfNotPresent
+          name: hes-core
+          ports:
+            - containerPort: 8080
+              name: server
+              protocol: TCP
+            - containerPort: 30002
+              name: gateway
+              protocol: TCP
+            - containerPort: 30003
+              name: silo
+              protocol: TCP
+            - containerPort: 8066
+              name: dashboard
+              protocol: TCP
+          resources:
+            requests:
+              cpu: 500m
+              memory: 1Gi
+          volumeMounts:
+            - mountPath: /etc/local
+              name: hes-core-configmap
+              readOnly: true
+      volumes:
+        - configMap:
+            defaultMode: 420
+            name: hes-core-configmap
+          name: hes-core-configmap
+---
+apiVersion: v1
+data:
+  appsettings.json: ""
+  config_core.server: ""
+  kfccore.dll.config: ""
+  ProjectSettings.json: ""
+kind: ConfigMap
+metadata:
+  name: hes-core-configmap
