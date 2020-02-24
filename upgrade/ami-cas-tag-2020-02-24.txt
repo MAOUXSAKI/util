@@ -1,0 +1,11 @@
+image.kaifa-empower.com/ami/ami-api-archive-service:2.0.14.0F20200223-268-2.0.14.0-bc4c902
+image.kaifa-empower.com/ami/ami-api-big-data-service:2.0.14.0F20200221-85-2.0.14.0-410a1cf
+image.kaifa-empower.com/ami/ami-api-gateway-service:2.0.14.0F20200221-145-2.0.14.0
+image.kaifa-empower.com/ami/ami-api-hes-service:2.0.14.0F20200223-306-2.0.14.0-dc81a33
+image.kaifa-empower.com/ami/ami-api-ivy-app-service:2.0.14.0F20200221-52-2.0.14.0-5a165ef
+image.kaifa-empower.com/ami/ami-api-ivy-service:2.0.14.0F20200223-138-2.0.14.0-ac0414c
+image.kaifa-empower.com/ami/ami-api-mdm-service:2.0.14.0F20200223-168-2.0.14.0-d45e967
+image.kaifa-empower.com/ami/ami-api-register-service:1.0
+image.kaifa-empower.com/ami/ami-api-system-service:2.0.14.0F20200223-120-2.0.14.0-f308599
+image.kaifa-empower.com/ami/ami-web:cas-F2020-02-23-54
+image.kaifa-empower.com/ami/ami-api-job-service:2.0.14.0F20200223-157-2.0.14.0-d780f5e
