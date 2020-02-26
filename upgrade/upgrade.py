@@ -1,6 +1,21 @@
-import sys, re, docker, subprocess, os
-from openshift_api import OpenshiftClient
+import sys, re, docker, subprocess, os,datetime
+from openshift_api import OpenshiftClient,OpenshiftStatefulset
+import urllib3
+urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
+
+def mkdir(path):
+    import os
+    path = path.strip()
+    path = path.rstrip("\\")
+    isExists = os.path.exists(path)
+
+    # 判断结果
+    if not isExists:
+        os.makedirs(path)
+        return True
+    else:
+        return False
 
 class Properties:
 
@@ -105,7 +120,7 @@ def push_image(version_list, docker_cli):
         print('Pull Success')
 
 
-def upgrade_image(version_list, config):
+def upgrade_image(version_list, config,generate):
     url = config.get('url')
     key = OpenshiftClient.get_token(url, config.get('username'), config.get('password'))
     project = config.get('project')
@@ -115,6 +130,20 @@ def upgrade_image(version_list, config):
         tag = version.tag
         target_repository = version.target_repository
         openshift_cli.set_image(project, service_name, f'{target_repository}:{tag}')
+    service_list = openshift_cli.get_statefulset_list(OpenshiftStatefulset,project_code=project)
+    mkdir('version')
+
+
+    if generate:
+        version_file = open('version/ami-' + datetime.datetime.now().strftime('%Y-%m-%d_%H_%M') + '.txt', 'w')
+        for service in service_list:
+            group = service.name.split('-')[0]
+            if group in ['hes','ami']:
+                version = service.pod.containers[0].image_name.split(':')[-1]
+                line = f'{service.name}    \t{version}\n'
+                version_file.write(line)
+        version_file.close()
+
 
 
 if __name__ == '__main__':
@@ -132,7 +161,7 @@ if __name__ == '__main__':
         exit(1)
 
     action = sys.argv[1]
-    if action not in ['pull', 'push', 'upgrade', 'all']:
+    if action not in ['pull', 'push', 'update', 'all']:
         print("Action should be pull,push,upgrade,all")
         exit(1)
 
@@ -140,6 +169,10 @@ if __name__ == '__main__':
     if not os.path.exists(version_file):
         print(f"{version_file}: File Not Exist")
         exit(1)
+    if 'version' != version_file.split('/')[0]:
+        generate = True
+    else:
+        generate = False
 
     version_list = get_version_list(version_file, resource, target)
 
@@ -151,12 +184,12 @@ if __name__ == '__main__':
         docker_cli = docker.from_env()
         docker_cli.login(registry=target, username=target_username, password=target_password)
         push_image(version_list, docker_cli)
-    elif action == 'upgrade':
-        upgrade_image(version_list, config)
+    elif action == 'update':
+        upgrade_image(version_list, config,generate)
     elif action == 'all':
         docker_cli = docker.from_env()
         docker_cli.login(registry=resource, username=resource_username, password=resource_password)
         docker_cli.login(registry=target, username=target_username, password=target_password)
         pull_image(version_list)
         push_image(version_list, docker_cli)
-        upgrade_image(version_list, config)
+        upgrade_image(version_list, config,generate)
