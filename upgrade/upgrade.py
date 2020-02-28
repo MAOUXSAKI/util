@@ -158,17 +158,17 @@ if __name__ == '__main__':
 
     if len(sys.argv) < 3:
         print("Lost some param")
-        exit(1)
+        os._exit(1)
 
     action = sys.argv[1]
     if action not in ['pull', 'push', 'update', 'all']:
         print("Action should be pull,push,upgrade,all")
-        exit(1)
+        os._exit(1)
 
     version_file = sys.argv[2]
     if not os.path.exists(version_file):
         print(f"{version_file}: File Not Exist")
-        exit(1)
+        os._exit(1)
     if 'version' != version_file.split('/')[0]:
         generate = True
     else:
