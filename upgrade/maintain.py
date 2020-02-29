@@ -151,10 +151,17 @@ if __name__ == '__main__':
     resource = config.get('resource')
     target = config.get('target')
     resource_username = config.get('resource.username')
-    resource_password = config.get('resource.password')
+    url = config.get('url')
+    if "key" == config.get('resource.mode'):
+        resource_password = OpenshiftClient.get_token(url, config.get('username'), config.get('password'))
+    else:
+        resource_password = config.get('resource.password')
 
     target_username = config.get('target.username')
-    target_password = config.get('target.password')
+    if "key" == config.get('target.mode'):
+        target_password = OpenshiftClient.get_token(url, config.get('username'), config.get('password'))
+    else:
+        target_password = config.get('target.password')
 
     if len(sys.argv) < 3:
         print("Lost some param")
